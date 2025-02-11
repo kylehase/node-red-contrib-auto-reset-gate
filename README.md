@@ -11,7 +11,7 @@ Install via the Node-RED palette manager:
 1.  Open the Node-RED menu (top-right hamburger icon).
 2.  Select "Manage palette".
 3.  Go to the "Install" tab.
-4.  Search for `node-red-contrib-auto-reset-gate`.
+4.  Search for `@kylehase/node-red-contrib-auto-reset-gate`.
 5.  Click "Install".
 
 Alternatively, install from the command line in your Node-RED user directory (typically `~/.node-red`):
