@@ -24,9 +24,12 @@ npm install node-red-contrib-auto-reset-gate
 
 This node acts as a gate that can be either open (passing messages) or closed (blocking messages). The gate's state is controlled by a combination of a configurable default state, a message property, a match value, and a reset delay.
 
+![Node configuration](images/configuration.png)
+![Example flow](images/example-flow.png)
+
 ### Input
 
-The node has a single input. Messages arriving at this input are either passed through to the output or blocked, depending on the gate's state.
+Messages arriving at this input are either passed through to the output or blocked, depending on the gate's state.
 
 ### Control
 
@@ -38,9 +41,13 @@ If this condition is met, the gate's state is toggled (from open to closed, or c
 
 If the `Message Property` does not exist in the incoming message, the gate's state will *not* change, and the message will either pass or be blocked based on the current gate state.
 
+Control messages recevied during the delay will extend the delay.
+
 ### Output
 
 If the gate is open, messages from the input are passed through to the output. If the gate is closed, messages are blocked and *not* sent to the output.
+
+Control messages are not passed to output.
 
 ## Configuration
 
@@ -52,9 +59,11 @@ If the gate is open, messages from the input are passed through to the output. I
     *   `Closed`: The gate starts closed (blocking messages). A matching message *opens* the gate temporarily.
     *   `Open`: The gate starts open (passing messages). A matching message *closes* the gate temporarily.
 
-*   **Message Property:** (Required) The property of the incoming message (`msg`) to check. Supports nested properties (e.g., `payload.command.activate`). Uses a standard Node-RED `typedInput` restricted to `msg` properties.
+#### Control
 
-*   **Match Value:** (Required) The value that `msg.[Message Property]` must equal (as a string) to trigger the gate.
+*   **Property:** (Required) The property of the incoming message (`msg`) to check. Supports nested properties (e.g., `payload.command.activate`). Uses a standard Node-RED `typedInput` restricted to `msg` properties.
+
+*   **Value:** (Required) The value that `msg.[Message Property]` must equal (as a string) to trigger the gate.
 
 ## Status Indicator
 
@@ -66,53 +75,22 @@ The node displays a status indicator below its icon in the flow editor:
 
 ## Example Flows
 
-### Example 1: Temporary Light Switch
+### Example: Prevent race conditions
 
-This flow demonstrates using the `auto-reset-gate` to create a temporary light switch. A button press turns the light on, and it automatically turns off after 5 seconds.
+This flow demonstrates using the `auto-reset-gate` to prevent a user from toggling a light off if they press a light button at almost the exact same time as a motion sensor trigger. 
 
-1.  **Inject Node:** Configure to send a string "on" to the `payload`.
+1.  **Button state node:** Attach to Auto-Reset-Gate. 
+1.  **Motion sensor node:** Attach to Auto-Reset-Gate and light_on node.
 2.  **Auto-Reset Gate Node:**
-    *   `Delay`: 5000 (5 seconds)
-    *   `Default State`: Closed
-    *   `Message Property`: payload
+    *   `Delay`: 3000 (3 seconds)
+    *   `Default State`: Open (default)
+    *   `Message Property`: msg.state
     *   `Match Value`: on
-3.  **Change Node:** Set `msg.payload` to true (or whatever your light control node expects for "on").
-4.  **Light Control Node:** (e.g., a node that controls a smart bulb).
+	* 	Attach to Light toggle node
+4.  **Light_on Node:** Node that turns a light on when motion is detected
+5.  **Light-Togle Node:** Node that toggles a light on/off when a button is pressed
 
-When the Inject node sends "on", the gate opens, the Change node sets the payload to `true`, and the light turns on. After 5 seconds, the gate closes, blocking any further messages (until another "on" message is received).
-
-### Example 2: Debounced Button
-
-This flow uses the `auto-reset-gate` to debounce a button press, preventing multiple triggers from a single button press.
-
-1.  **Button Node:** (e.g., a physical button input node).
-2.  **Auto-Reset Gate Node:**
-    *   `Delay`: 200 (200 milliseconds)
-    *   `Default State`: Open
-    *   `Message Property`: payload
-    *   `Match Value`: (whatever your button node sends when pressed, e.g., "pressed")
-3.  **Your Processing Logic:** (Whatever you want to do when the button is pressed).
-
-The first button press will pass through. The gate then closes for 200ms, blocking any subsequent "bounces" from the button. After 200ms, the gate opens again, ready for the next *distinct* button press.
-
-### Example 3: Controlling a Motor with Topic
-
-This example uses `msg.topic` to control the gate, allowing different topics to open or close it.
-
-1.  **MQTT In Node:** Subscribe to a topic (e.g., "motor/control").
-2. **Auto-Reset Gate Node**:
-    *   `Delay`: 10000
-    *   `Default State`: Closed
-    *   `Message Property`: topic
-    *   `Match Value`: motor/control
-3.  **Switch Node:**
-    *   Route messages based on `msg.payload`:
-        *   If `msg.payload` is "start", continue.
-        *   Otherwise, stop.
-4.  **Change Node:** Set `msg.payload` to whatever your motor control node expects for "start" (e.g., 1).
-5.  **Motor Control Node:** (e.g., a node that controls a motor).
-
-Sending a message with `topic: "motor/control"` and `payload: "start"` will open the gate for 10 seconds, allowing the motor to start. The Switch node prevents messages with different payloads from reaching the motor control node. Sending other messages on the same topic will *not* re-trigger the gate while it's already open (or closed, depending on `Default State`).
+The motion sensor will turn the light on and close the gate for 3s, blocking the button press message.
 
 ## License
 

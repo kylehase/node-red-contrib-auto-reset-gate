@@ -1,0 +1,106 @@
+[
+    {
+        "id": "motion_trigger",
+        "type": "trigger",
+        "z": "flow_id",
+        "name": "Motion Detected",
+        "op1": "",
+        "op2": "off",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "5",
+        "extend": true,
+        "overrideDelay": false,
+        "unit": "s",
+        "reset": "",
+        "bytopic": "all",
+        "outputs": 2,
+        "diff": 1,
+        "topic": "",
+        "payload": "on",
+        "payloadtype": "str",
+        "timerOnce": "",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "gate"
+            ],
+            []
+        ],
+        "info": "Simulates a motion sensor. Sends 'on' when motion is detected, and 'off' after a delay."
+    },
+    {
+        "id": "button_press",
+        "type": "inject",
+        "z": "flow_id",
+        "name": "Button Press",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "button",
+        "payload": "press",
+        "payloadType": "str",
+        "x": 150,
+        "y": 160,
+        "wires": [
+            [
+                "gate"
+            ]
+        ],
+        "info": "Simulates a button press event."
+    },
+    {
+        "id": "gate",
+        "type": "auto-reset-gate",
+        "z": "flow_id",
+        "name": "Auto-Reset Gate",
+        "delay": "2000",
+        "defaultClosed": false,
+        "property": "payload",
+        "value": "on",
+        "x": 350,
+        "y": 130,
+        "wires": [
+            [
+                "output"
+            ]
+        ],
+        "info": "Closes the gate for 2 seconds when triggered by motion to block button press."
+    },
+    {
+        "id": "output",
+        "type": "debug",
+        "z": "flow_id",
+        "name": "Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 550,
+        "y": 130,
+        "wires": [],
+        "info": "Displays the gate's output in the debug tab."
+    },
+    {
+        "id": "flow_id",
+        "type": "tab",
+        "label": "Auto-Reset Gate Example",
+        "disabled": false,
+        "info": "This flow demonstrates the use of the auto-reset-gate node. It simulates motion detection and a button press, both of which trigger the gate to open for a short period."
+    }
+]
