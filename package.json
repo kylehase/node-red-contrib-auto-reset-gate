@@ -1,6 +1,6 @@
 {
     "name": "@kylehase/node-red-contrib-auto-reset-gate",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A Node-RED node that acts as an auto-resetting gate, blocking or allowing messages for a configurable delay after receiving a control message.",
     "dependencies": {},
     "repository": {
@@ -17,7 +17,7 @@
 		"race-condition"
     ],
     "node-red": {
-        "version": ">=3.0.0"
+        "version": ">=3.0.0",
 		"nodes": {
             "auto-reset-gate": "auto-reset-gate.js"
         }
