@@ -11,17 +11,19 @@
         "node-red",
         "gate",
         "delay",
+		"node",
         "flow-control",
-        "auto-reset"
+        "auto-reset",
+		"race-condition"
     ],
     "node-red": {
-        "nodes": {
+        "version": ">=3.0.0"
+		"nodes": {
             "auto-reset-gate": "auto-reset-gate.js"
-        },
-		"version": ">=4.0.0"
+        }
     },
 	"engines": {
-		"node": ">=20.0.0"
+		"node": ">=18.0.0"
 	},
     "author": "kylehase",
     "license": "MIT"

@@ -1,0 +1,138 @@
+[
+    {
+        "id": "button_event",
+        "type": "inject",
+        "z": "generic_flow",
+        "name": "Button Event",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "data.new_state.attributes.event_type",
+                "v":"single",
+                "vt":"str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "button",
+        "payload": "pressed",
+        "payloadType": "str",
+        "x": 140,
+        "y": 275,
+        "wires": [
+            [
+                "light_toggle",
+                "auto_gate"
+            ]
+        ],
+        "info": "Button press event"
+    },
+    {
+        "id": "motion_event",
+        "type": "trigger",
+        "z": "generic_flow",
+        "name": "Motion Event",
+        "op1": "",
+        "op2": "off",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "5",
+        "extend": true,
+        "overrideDelay": false,
+        "unit": "s",
+        "reset": "",
+        "bytopic": "all",
+        "outputs": 2,
+        "diff": 1,
+        "topic": "",
+        "payload": "on",
+        "payloadtype": "str",
+        "timerOnce": "",
+        "x": 130,
+        "y": 200,
+        "wires": [
+            [
+                "auto_gate"
+            ],
+            []
+        ],
+        "info": "Motion detected"
+    },
+    {
+        "id": "auto_gate",
+        "type": "auto-reset-gate",
+        "z": "generic_flow",
+        "name": "10s Auto Gate",
+        "delay": "10000",
+        "defaultClosed": false,
+        "property": "data.new_state.attributes.event_type",
+        "value": "single",
+        "x": 405,
+        "y": 200,
+        "wires": [
+            [
+                "debug_output"
+            ]
+        ],
+        "info": "Closes the gate for 10 seconds to block the motion sensor for 10s after the user turns the light off"
+    },
+    {
+        "id": "light_toggle",
+        "type": "change",
+        "z": "generic_flow",
+        "name": "Toggle Light",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "light toggled",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 405,
+        "y": 275,
+        "wires": [
+            []
+        ],
+        "info": "Simulates toggling a light. Simply changes the payload to 'light toggled'."
+    },
+    {
+        "id": "debug_output",
+        "type": "debug",
+        "z": "generic_flow",
+        "name": "Debug Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 200,
+        "wires": [],
+        "info": "Displays the gate's output in the debug tab."
+    },
+    {
+        "id": "generic_flow",
+        "type": "tab",
+        "label": "Generic Auto-Reset Gate Example",
+        "disabled": false,
+        "info": "This flow demonstrates the use of the auto-reset-gate node to avoid a common race condition where light is turned on by a motion sensor just after a user turned it off."
+    }
+]
